@@ -4,15 +4,24 @@
     <div class="card" v-for="picture in pictureList" :key="picture.id">
       <img class="img" :src="picture.src"><br>
     </div>
+
+    <div class="card audio-card">
+      <button @click="startMic">{{ micOpen ? '停止录音' : '开始录音' }}</button>
+      <textarea v-model="speechResult" placeholder="语音识别结果"></textarea>
+      <button @click="confirmSpeech">确认</button>
+    </div>
   </div>
 </template>
 
 <script>
+import Recorder from 'js-audio-recorder';
+import axios from "axios";
+
 export default {
   name: 'ChildView',
-  data(){
-    return{
-      prestory:'　从前有个可爱的小姑娘，谁见了都喜欢，但最喜欢她的是她的奶奶，简直是她要什么就给她什么。一次，奶奶送给小姑娘一顶用丝绒做的小红帽，戴在她的头上正好合适。从此，姑娘再也不愿意戴任何别的帽子，于是大家便叫她“小红帽”。\n' +
+  data() {
+    return {
+      prestory: '　从前有个可爱的小姑娘，谁见了都喜欢，但最喜欢她的是她的奶奶，简直是她要什么就给她什么。一次，奶奶送给小姑娘一顶用丝绒做的小红帽，戴在她的头上正好合适。从此，姑娘再也不愿意戴任何别的帽子，于是大家便叫她“小红帽”。\n' +
           '\n' +
           '　　一天，妈妈对小红帽说：“来，小红帽，这里有一块蛋糕和一瓶葡萄酒，快给奶奶送去，奶奶生病了，身子很虚弱，吃了这些就会好一些的。趁着现在天还没有热，赶紧动身吧。在路上要好好走，不要跑，也不要离开大路，否则你会摔跤的，那样奶奶就什么也吃不上了。到奶奶家的时候，别忘了说‘早上好’，也不要一进屋就东瞧西瞅。”\n' +
           '\n' +
@@ -93,12 +102,103 @@ export default {
           '　　小红帽提了很多很多水，把那个大石头槽子装得满满的。香肠的气味飘进了狼的鼻孔，它使劲地用鼻子闻呀闻，并且朝下张望着，到最后把脖子伸得太长了，身子开始往下滑。它从屋顶上滑了下来，正好落在大石槽中，淹死了。\n' +
           '\n' +
           '　　小红帽高高兴兴地回了家，从此再也没有谁伤害过她。',
-      pictureList:[]
+      pictureList: [],
+      micOpen: false,
+      chunk: null,
+      speechResult: '', // 语音识别结果
+      emotionResult: '' // 情绪识别结果[pessimistic（负向情绪）、neutral（中性情绪）、optimistic（正向情绪]
     }
+  },
+  methods: {
+    startMic() {
+      this.micOpen = !this.micOpen;
+      if (this.micOpen) {
+        const recorder = new Recorder({sampleRate: 16000});
+        recorder.start().then(() => {
+          // 开始录音
+          console.log('开始录音');
+          this.chunk = recorder;
+        }, (error) => {
+          // 出错了
+          console.log(`${error.name} : ${error.message}`);
+        });
+      } else {
+        const blob = this.chunk.getPCMBlob();
+        const file = new File([blob], 'mic', {type: 'audio/pcm', lastModified: Date.now()});
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          const base64 = evt.target.result;
+          const emotion_access_token = "24.0f37f8647d43d9e2aa55a01e6659f524.2592000.1719398210.282335-75044811"
+
+          const speech_data = {
+            format: 'pcm',
+            rate: 16000,
+            dev_pid: 1537,
+            channel: 1,
+            token: '24.a4e936ad7e6803a85db6908aa6795b59.2592000.1719396766.282335-74788498',
+            cuid: 'baidu_workshop',
+            len: file.size,
+            speech: base64.substring(37)
+          };
+
+          // 百度api调用
+          // 语音识别
+          axios.post('/baidu_api_speech', speech_data).then((res) => {
+            if (res.data.result[0] !== '我不知道。') {
+              console.log(res.data.result[0]);
+              this.speechResult = res.data.result[0];
+              const emotion_data = {
+                text: this.speechResult
+              }
+
+              // 情绪识别
+              console.log(emotion_data)
+              axios.post('/baidu_api_emotion?charset=UTF-8&access_token=' +
+                  emotion_access_token, emotion_data).then((res) => {
+                    console.log(res.data)
+                    if (res.data['items'] !== undefined) {
+                      console.log(res.data.items[0].label)
+                      this.emotionResult = res.data.items[0].label;
+                    }
+              })
+            }
+          });
+        };
+        reader.readAsDataURL(blob);
+        this.chunk.destroy().then(() => {
+          this.chunk = null;
+        });
+      }
+    },
+    confirmSpeech() {
+      // 确认语音识别结果
+      console.log(this.speechResult)
+      console.log(this.emotionResult)
+    },
   }
 }
 </script>
 
 <style scoped>
-
+.card {
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+.audio-card {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #fff;
+}
+textarea {
+  width: 100%;
+  height: 100px;
+  margin-bottom: 10px;
+}
+button {
+  margin-right: 10px;
+}
 </style>
