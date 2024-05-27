@@ -152,10 +152,8 @@ export default {
               }
 
               // 情绪识别
-              console.log(emotion_data)
               axios.post('/baidu_api_emotion?charset=UTF-8&access_token=' +
                   emotion_access_token, emotion_data).then((res) => {
-                    console.log(res.data)
                     if (res.data['items'] !== undefined) {
                       console.log(res.data.items[0].label)
                       this.emotionResult = res.data.items[0].label;
