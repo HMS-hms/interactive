@@ -1,15 +1,18 @@
 <template>
   <div>
+    <div>
+      <button @click="demoShow">展示demo</button>
+    </div>
     图片展示
     <div class="card" v-for="picture in pictureList" :key="picture.id">
       <img class="img" :src="picture.src"><br>
     </div>
 
-    <div class="card audio-card">
-      <button @click="startMic">{{ micOpen ? '停止录音' : '开始录音' }}</button>
-      <textarea v-model="speechResult" placeholder="语音识别结果"></textarea>
-      <button @click="confirmSpeech">确认</button>
-    </div>
+<!--    <div class="card audio-card">-->
+<!--      <button @click="startMic">{{ micOpen ? '停止录音' : '开始录音' }}</button>-->
+<!--      <textarea v-model="speechResult" placeholder="语音识别结果"></textarea>-->
+<!--      <button @click="confirmSpeech">确认</button>-->
+<!--    </div>-->
   </div>
 </template>
 
@@ -59,7 +62,7 @@ export default {
           '\n' +
           '　　狼刚拉起门栓，那门就开了。狼二话没说就冲到奶奶的床前，把奶奶吞进了肚子。然后她穿上奶奶的衣服，戴上她的帽子，躺在床上，还拉上了帘子。\n' +
           '\n' +
-          '　　可这时小红帽还在跑来跑去地采花。直到采了许多许多，她都拿不了啦，她才想起奶奶，重新上路去奶奶家。https://www.qigushi.com\n' +
+          '　　可这时小红帽还在跑来跑去地采花。直到采了许多许多，她都拿不了啦，她才想起奶奶，重新上路去奶奶家。\n' +
           '\n' +
           '　　看到奶奶家的屋门敞开着，她感到很奇怪。她一走进屋子就有一种异样的感觉，心中便想：“天哪！平常我那么喜欢来奶奶家，今天怎么这样害怕？”她大声叫道：“早上好！”，可是没有听到回答。她走到床前拉开帘子，只见奶奶躺在床上，帽子拉得低低的，把脸都遮住了，样子非常奇怪。\n' +
           '\n' +
@@ -110,6 +113,14 @@ export default {
     }
   },
   methods: {
+    demoShow(){
+      const texts=this.prestory.split(/(?<=[.!?。！？\n])\s+/);
+      for (let i = 0; i < texts.length; i++) {
+        axios.post('172.', texts[i]).then((res) => {
+          console.log(res.data);
+        })
+      }
+    },
     startMic() {
       this.micOpen = !this.micOpen;
       if (this.micOpen) {
