@@ -5,14 +5,14 @@
     </div>
     图片展示
     <div class="card" v-for="picture in pictureList" :key="picture.id">
-      <img class="img" :src="picture.src"><br>
+      <el-image class="img" :src="picture.src" alt="none"></el-image><br>
     </div>
 
-<!--    <div class="card audio-card">-->
-<!--      <button @click="startMic">{{ micOpen ? '停止录音' : '开始录音' }}</button>-->
-<!--      <textarea v-model="speechResult" placeholder="语音识别结果"></textarea>-->
-<!--      <button @click="confirmSpeech">确认</button>-->
-<!--    </div>-->
+    <div class="card audio-card">
+      <button @click="startMic">{{ micOpen ? '停止录音' : '开始录音' }}</button>
+      <textarea v-model="speechResult" placeholder="语音识别结果"></textarea>
+      <button @click="confirmSpeech">确认</button>
+    </div>
   </div>
 </template>
 
@@ -112,14 +112,19 @@ export default {
       emotionResult: '' // 情绪识别结果[pessimistic（负向情绪）、neutral（中性情绪）、optimistic（正向情绪]
     }
   },
+
   methods: {
     demoShow(){
       const texts=this.prestory.split(/(?<=[.!?。！？\n])\s+/);
-      for (let i = 0; i < texts.length; i++) {
-        axios.post('172.', texts[i]).then((res) => {
-          console.log(res.data);
-        })
-      }
+      const formData = new FormData();
+      formData.append('prompt',texts[0]);
+      axios.post('/generate_picture',formData,{ responseType: "blob" }).then((res) => {
+        // console.log(res)
+        const url = window.URL.createObjectURL(new Blob([res.data]));
+        console.log(url);
+        this.pictureList.push({src:url,id:this.pictureList.length})
+        // console.log(this.pictureList)
+      })
     },
     startMic() {
       this.micOpen = !this.micOpen;

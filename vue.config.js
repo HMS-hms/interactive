@@ -13,6 +13,11 @@ module.exports = defineConfig({
         changeOrigin: true,
         pathRewrite: { '^/baidu_api_emotion': '' },
       },
+      '/generate_picture':{
+        target: 'http://localhost:5000/generatePic',
+        changeOrigin: true,
+        pathRewrite: { '^/generate_picture': '' },
+      }
     },
   },
 });
