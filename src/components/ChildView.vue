@@ -114,7 +114,11 @@ export default {
       history: []
     }
   },
-
+  mounted() {
+    this.$nextTick(() => {
+      this.scrollToBottom();
+    });
+  },
   methods: {
     scrollToBottom() {
       const container = this.$refs.messageContainer;
@@ -231,7 +235,7 @@ export default {
 .chat-container {
   display: flex;
   flex-direction: column;
-  height: 70vh;
+  height: 80vh;
   max-width: 600px;
   margin: 0 auto;
   border: 1px solid #ccc;
@@ -248,8 +252,6 @@ export default {
 }
 
 .message-card {
-  max-height: 300px; /* Limit the height of the card */
-  overflow-y: auto; /* Enable internal scrolling */
   margin-bottom: 10px;
   display: flex;
   justify-content: center;
@@ -257,7 +259,6 @@ export default {
 
 .img {
   max-width: 100%;
-  max-height: 300px;
   width: auto;
   height: auto;
   border-radius: 10px;
