@@ -1,17 +1,18 @@
 <template>
-  <div>
-    <div>
-      <button @click="demoShow">展示demo</button>
-    </div>
-    图片展示
-    <div class="card" v-for="picture in pictureList" :key="picture.id">
-      <el-image class="img" :src="picture.src" alt="none"></el-image><br>
+<!--    <div>-->
+<!--      <button @click="demoShow">展示demo</button>-->
+<!--    </div>-->
+<!--    图片展示-->
+  <div class="chat-container">
+    <div class="messages" ref="messageContainer">
+      <div class="message-card" v-for="picture in pictureList" :key="picture.id">
+        <el-image class="img" :src="picture.src" alt="none"></el-image>
+      </div>
     </div>
 
-    <div class="card audio-card">
-      <button @click="startMic">{{ micOpen ? '停止录音' : '开始录音' }}</button>
+    <div class="input-area">
+      <button @click="startMic">{{ micOpen ? '确认' : '开始录音' }}</button>
       <textarea v-model="speechResult" placeholder="语音识别结果"></textarea>
-      <button @click="confirmSpeech">确认</button>
     </div>
   </div>
 </template>
@@ -115,6 +116,10 @@ export default {
   },
 
   methods: {
+    scrollToBottom() {
+      const container = this.$refs.messageContainer;
+      container.scrollTop = container.scrollHeight;
+    },
     sendReq(prompt){
       const formData = new FormData();
       formData.append('prompt',prompt);
@@ -151,7 +156,7 @@ export default {
         const reader = new FileReader();
         reader.onload = (evt) => {
           const base64 = evt.target.result;
-          const emotion_access_token = "24.0f37f8647d43d9e2aa55a01e6659f524.2592000.1719398210.282335-75044811"
+          // const emotion_access_token = "24.0f37f8647d43d9e2aa55a01e6659f524.2592000.1719398210.282335-75044811"
 
           const speech_data = {
             format: 'pcm',
@@ -170,18 +175,19 @@ export default {
             if (res.data.result[0] !== '我不知道。') {
               console.log(res.data.result[0]);
               this.speechResult = res.data.result[0];
-              const emotion_data = {
-                text: this.speechResult
-              }
-
-              // 情绪识别
-              axios.post('/baidu_api_emotion?charset=UTF-8&access_token=' +
-                  emotion_access_token, emotion_data).then((res) => {
-                    if (res.data['items'] !== undefined) {
-                      console.log(res.data.items[0].label)
-                      this.emotionResult = res.data.items[0].label;
-                    }
-              })
+              this.confirmSpeech()
+              // const emotion_data = {
+              //   text: this.speechResult
+              // }
+              //
+              // // 情绪识别
+              // axios.post('/baidu_api_emotion?charset=UTF-8&access_token=' +
+              //     emotion_access_token, emotion_data).then((res) => {
+              //       if (res.data['items'] !== undefined) {
+              //         console.log(res.data.items[0].label)
+              //         this.emotionResult = res.data.items[0].label;
+              //       }
+              // })
             }
           });
         };
@@ -210,30 +216,82 @@ export default {
       this.sendReq(prompt)
       this.history.push(this.speechResult)
     },
+  },
+  watch: {
+    pictureList() {
+      this.$nextTick(() => {
+        this.scrollToBottom();
+      });
+    }
   }
 }
 </script>
 
 <style scoped>
-.card {
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 70vh;
+  max-width: 600px;
+  margin: 0 auto;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.messages {
+  flex: 1;
   padding: 20px;
-  margin-bottom: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.message-card {
+  max-height: 300px; /* Limit the height of the card */
+  overflow-y: auto; /* Enable internal scrolling */
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+}
+
+.img {
+  max-width: 100%;
+  max-height: 300px;
+  width: auto;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.input-area {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-top: 1px solid #ccc;
+}
+
+button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  margin-right: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+textarea {
+  flex: 1;
+  padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
-}
-.audio-card {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #fff;
-}
-textarea {
-  width: 100%;
-  height: 100px;
-  margin-bottom: 10px;
-}
-button {
-  margin-right: 10px;
+  font-size: 16px;
+  resize: none;
 }
 </style>
