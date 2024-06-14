@@ -109,22 +109,29 @@ export default {
       micOpen: false,
       chunk: null,
       speechResult: '', // 语音识别结果
-      emotionResult: '' // 情绪识别结果[pessimistic（负向情绪）、neutral（中性情绪）、optimistic（正向情绪]
+      emotionResult: '', // 情绪识别结果[pessimistic（负向情绪）、neutral（中性情绪）、optimistic（正向情绪]
+      history: []
     }
   },
 
   methods: {
-    demoShow(){
-      const texts=this.prestory.split(/(?<=[.!?。！？\n])\s+/);
+    sendReq(prompt){
       const formData = new FormData();
-      formData.append('prompt',texts[0]);
+      formData.append('prompt',prompt);
       axios.post('/generate_picture',formData,{ responseType: "blob" }).then((res) => {
         // console.log(res)
         const url = window.URL.createObjectURL(new Blob([res.data]));
         console.log(url);
-        this.pictureList.push({src:url,id:this.pictureList.length})
+        this.pictureList.push({src:url,id:this.pictureList.length});
         // console.log(this.pictureList)
       })
+    },
+    demoShow(){
+      const texts=this.prestory.split(/(?<=[.!?。！？\n])\s+/);
+      for (let i=0; i<1; i++){
+        this.sendReq(texts[i]);
+      }
+
     },
     startMic() {
       this.micOpen = !this.micOpen;
@@ -184,10 +191,24 @@ export default {
         });
       }
     },
+    assembleHistory(){
+      let his = '';
+      for(let i=0;i<this.history.length;i++){
+        his+=(this.history[i]+'\n');
+      }
+      return his;
+    },
     confirmSpeech() {
       // 确认语音识别结果
       console.log(this.speechResult)
       console.log(this.emotionResult)
+      let his=this.assembleHistory()
+      let prompt='以下为历史记录\n'
+      prompt+=his
+      prompt+='\n你需要针对以下内容进行图片生成:\n'
+      prompt+=this.speechResult
+      this.sendReq(prompt)
+      this.history.push(this.speechResult)
     },
   }
 }
