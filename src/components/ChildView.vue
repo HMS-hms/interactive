@@ -3,18 +3,104 @@
 <!--      <button @click="demoShow">展示demo</button>-->
 <!--    </div>-->
 <!--    图片展示-->
-  <div class="chat-container">
-    <div class="messages" ref="messageContainer">
-      <div class="message-card" v-for="picture in pictureList" :key="picture.id">
-        <el-image class="img" :src="picture.src" alt="none"></el-image>
+  <el-container>
+    <el-aside>
+      <div style="padding-top: 90px">
+      <div>
+        人物
       </div>
-    </div>
+      <div style="text-align: left">
+        性别：
+        <a @click="sex_clik1" style="padding-right: 45px;">
+          <el-radio v-model="sex" label="男" >男</el-radio>
+        </a>
+        <a @click="sex_clik2">
+          <el-radio v-model="sex" label="女">女</el-radio>
+        </a>
+      </div>
+      <div style="text-align: left">
+        年龄：
+        <a @click="age_clik1"  style="padding-right: 30px;">
+          <el-radio v-model="age" label="小孩">小孩</el-radio>
+        </a>
+        <a @click="age_clik2" style="padding-right: 30px;">
+          <el-radio v-model="age" label="成年人">成年人</el-radio>
+        </a>
+        <a @click="age_clik3">
+          <el-radio v-model="age" label="老年人">老年人</el-radio>
+        </a>
+      </div>
+      <div style="text-align: left">
+        发色：
+        <a @click="hair_clik1"  style="padding-right: 30px;">
+          <el-radio v-model="hair_color" label="黑色">黑色</el-radio>
+        </a>
+        <a @click="hair_clik2" style="padding-right: 43px;">
+          <el-radio v-model="hair_color" label="金色">金色</el-radio>
+        </a>
+        <a @click="hair_clik3">
+          <el-radio v-model="hair_color" label="褐色">褐色</el-radio>
+        </a>
+      </div>
+      <div>
+        猫
+      </div>
+      <div style="text-align: left">
+        颜色：
+        <a @click="cat_clik1"  style="padding-right: 30px;">
+          <el-radio v-model="cat_color" label="黄色">黄色</el-radio>
+        </a>
+        <a @click="cat_clik2" style="padding-right: 43px;">
+          <el-radio v-model="cat_color" label="黑色">黑色</el-radio>
+        </a>
+        <a @click="cat_clik3">
+          <el-radio v-model="cat_color" label="白色">白色</el-radio>
+        </a>
+<!--        <a @click="cat_clik4">-->
+<!--          <el-radio v-model="cat_color" label="黑白相间">黑白相间</el-radio>-->
+<!--        </a>-->
+      </div>
+      <div>
+        狗
+      </div>
+      <div style="text-align: left">
+        颜色：
+        <a @click="dog_color_clik1"  style="padding-right: 30px;">
+          <el-radio v-model="dog_color" label="黄色">黄色</el-radio>
+        </a>
+        <a @click="dog_color_clik2" style="padding-right: 43px;">
+          <el-radio v-model="dog_color" label="黑色">黑色</el-radio>
+        </a>
+        <a @click="dog_color_clik3">
+          <el-radio v-model="dog_color" label="白色">白色</el-radio>
+        </a>
+      </div>
+      <div style="text-align: left">
+        体型：
+        <a @click="dog_form_clik1"  style="padding-right: 30px;">
+          <el-radio v-model="dog_form" label="小型">小型</el-radio>
+        </a>
+        <a @click="dog_form_clik2">
+          <el-radio v-model="dog_form" label="大型">大型</el-radio>
+        </a>
+      </div>
+      </div>
+    </el-aside>
+    <el-main>
+      <div class="chat-container">
+        <div class="messages" ref="messageContainer">
+          <div class="message-card" v-for="picture in pictureList" :key="picture.id">
+            <el-image class="img" :src="picture.src" alt="none"></el-image>
+          </div>
+        </div>
 
-    <div class="input-area">
-      <button @click="startMic">{{ micOpen ? '确认' : '开始录音' }}</button>
-      <textarea v-model="speechResult" placeholder="语音识别结果"></textarea>
-    </div>
-  </div>
+        <div class="input-area">
+          <button @click="startMic">{{ micOpen ? '确认' : '开始录音' }}</button>
+          <textarea v-model="speechResult" placeholder="语音识别结果"></textarea>
+        </div>
+      </div>
+    </el-main>
+  </el-container>
 </template>
 
 <script>
@@ -111,7 +197,13 @@ export default {
       chunk: null,
       speechResult: '', // 语音识别结果
       emotionResult: '', // 情绪识别结果[pessimistic（负向情绪）、neutral（中性情绪）、optimistic（正向情绪]
-      history: []
+      history: [],
+      sex:'',
+      age:'',
+      hair_color:'',
+      cat_color:'',
+      dog_color:'',
+      dog_form:''
     }
   },
   mounted() {
@@ -120,6 +212,118 @@ export default {
     });
   },
   methods: {
+    sex_clik1(){
+      if(this.sex==='男'){
+        setTimeout(() => {
+          this.sex=''
+        }, 10);
+      }
+    },
+    sex_clik2(){
+      if(this.sex==='女'){
+        setTimeout(() => {
+          this.sex=''
+        }, 10);
+      }
+    },
+    age_clik1(){
+      if(this.age==='小孩'){
+        setTimeout(() => {
+          this.age=''
+        }, 10);
+      }
+    },
+    age_clik2(){
+      if(this.age==='成年人'){
+        setTimeout(() => {
+          this.age=''
+        }, 10);
+      }
+    },
+    age_clik3(){
+      if(this.age==='老年人'){
+        setTimeout(() => {
+          this.age=''
+        }, 10);
+      }
+    },
+    hair_clik1(){
+      if(this.hair_color==='黑色'){
+        setTimeout(() => {
+          this.hair_color=''
+        }, 10);
+      }
+    },
+    hair_clik2(){
+      if(this.hair_color==='金色'){
+        setTimeout(() => {
+          this.hair_color=''
+        }, 10);
+      }
+    },
+    hair_clik3(){
+      if(this.hair_color==='褐色'){
+        setTimeout(() => {
+          this.hair_color=''
+        }, 10);
+      }
+    },
+    cat_clik1(){
+      if(this.cat_color==='黄色'){
+        setTimeout(() => {
+          this.cat_color=''
+        }, 10);
+      }
+    },
+    cat_clik2(){
+      if(this.cat_color==='黑色'){
+        setTimeout(() => {
+          this.cat_color=''
+        }, 10);
+      }
+    },
+    cat_clik3(){
+      if(this.cat_color==='白色'){
+        setTimeout(() => {
+          this.cat_color=''
+        }, 10);
+      }
+    },
+    dog_color_clik1(){
+      if(this.dog_color==='黄色'){
+        setTimeout(() => {
+          this.dog_color=''
+        }, 10);
+      }
+    },
+    dog_color_clik2(){
+      if(this.dog_color==='黑色'){
+        setTimeout(() => {
+          this.dog_color=''
+        }, 10);
+      }
+    },
+    dog_color_clik3(){
+      if(this.dog_color==='白色'){
+        setTimeout(() => {
+          this.dog_color=''
+        }, 10);
+      }
+    },
+    dog_form_clik1(){
+      if(this.dog_form==='小型'){
+        setTimeout(() => {
+          this.dog_form=''
+        }, 10);
+      }
+    },
+    dog_form_clik2(){
+      if(this.dog_form==='大型'){
+        setTimeout(() => {
+          this.dog_form=''
+        }, 10);
+      }
+    },
     scrollToBottom() {
       const container = this.$refs.messageContainer;
       container.scrollTop = container.scrollHeight;
